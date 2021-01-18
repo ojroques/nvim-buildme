@@ -1,7 +1,7 @@
 # nvim-buildme
 
 A Neovim plugin to build or run a project using the built-in terminal. It is
-written entirely in Lua.
+written entirely in Lua. See [example](#example) below for a demo.
 
 _**Note**: this plugin is mainly for my own use. I won't add new features if I
 don't need them. Feel free to submit PRs or fork the plugin though._
@@ -57,6 +57,13 @@ require('buildme').setup {
   wincmd = '',                -- a command to run prior to a build job (split, vsplit, ...)
 }
 ```
+
+## Example
+![demo](./demo.gif)
+
+Here the buildfile (in the right window) is a simple shell script with a single
+command: `make everything`. Running `:BuildMe` executes this script
+asynchronously in a new terminal buffer.
 
 ## License
 [LICENSE](./LICENSE)
