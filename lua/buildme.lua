@@ -28,9 +28,9 @@ end
 
 -------------------- PUBLIC --------------------------------
 local function edit()
-  local autocmd = 'au BufWritePost <buffer> call jobstart("chmod +x %s")'
   cmd(fmt('edit %s', opts.buildfile))
   -- Make the build file executable
+  local autocmd = 'au BufWritePost <buffer> call jobstart("chmod +x %s")'
   cmd(fmt(autocmd, opts.buildfile))
 end
 
@@ -55,13 +55,13 @@ local function build()
   end
   -- Move to buffer
   local job_window = fn.bufwinnr(job_buffer)
-  if job_window == -1 then
+  if job_window ~= -1 then
+    cmd(fmt('%d wincmd w', job_window))
+  else
     if opts.wincmd ~= '' then
       cmd(opts.wincmd)
     end
     cmd(fmt('buffer %d', job_buffer))
-  else
-    cmd(fmt('%d wincmd w', job_window))
   end
   -- Unset modified flag
   fn.setbufvar(job_buffer, '&modified', 0)
