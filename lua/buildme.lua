@@ -10,9 +10,9 @@ local job_buffer, job_id
 
 -------------------- OPTIONS -------------------------------
 local opts = {
-  buildfile = '.buildme.sh',
-  interpreter = 'bash',
-  wincmd = '',
+  buildfile = '.buildme.sh',  -- the build file to execute
+  interpreter = 'bash',       -- the interpreter to use (bash, python, ...)
+  wincmd = '',                -- a command to run prior to a build job
 }
 
 -------------------- HELPERS -------------------------------
