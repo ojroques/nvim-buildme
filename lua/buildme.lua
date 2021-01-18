@@ -5,13 +5,13 @@
 -------------------- VARIABLES -----------------------------
 local api, cmd, fn, vim = vim.api, vim.cmd, vim.fn, vim
 local fmt = string.format
-local nkeys = api.nvim_replace_termcodes("<C-\\><C-n>", true, false, true)
+local nkeys = api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true)
 local job_buffer, job_id
 
 -------------------- OPTIONS -------------------------------
 local opts = {
   buildfile = '.buildme.sh',
-  command = fn.getenv('SHELL') or 'bash',
+  interpreter = 'bash',
   wincmd = '',
 }
 
@@ -43,13 +43,16 @@ local function build()
     edit()
     return
   end
-  local command = ''
-  if opts.command ~= '' then
-    command = fmt('%s ', opts.command)
+  -- Format interpreter string
+  local interpreter = ''
+  if opts.interpreter ~= '' then
+    interpreter = fmt('%s ', opts.interpreter)
   end
+  -- Create scratch buffer
   if not job_buffer or fn.buflisted(job_buffer) == 0 then
     job_buffer = api.nvim_create_buf(true, true)
   end
+  -- Move to buffer
   local job_window = fn.bufwinnr(job_buffer)
   if job_window == -1 then
     if opts.wincmd ~= '' then
@@ -59,8 +62,11 @@ local function build()
   else
     cmd(fmt('%d wincmd w', job_window))
   end
+  -- Unset modified flag
   fn.setbufvar(job_buffer, '&modified', 0)
-  job_id = fn.termopen(fmt('%s%s', command, opts.buildfile))
+  -- Start build job
+  job_id = fn.termopen(fmt('%s%s', interpreter, opts.buildfile))
+  -- Exit terminal mode
   api.nvim_feedkeys(nkeys, 'n', false)
 end
 
