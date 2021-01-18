@@ -11,7 +11,7 @@ local job_buffer, job_id
 -------------------- OPTIONS -------------------------------
 local opts = {
   buildfile = '.buildme.sh',
-  shell = fn.getenv('SHELL') or 'bash',
+  command = fn.getenv('SHELL') or 'bash',
   wincmd = '',
 }
 
@@ -34,7 +34,7 @@ local function edit()
 end
 
 local function build()
-  local shell = ''
+  local command = ''
   if is_running() then
     echo('ErrorMsg', fmt('A build job is already running (id: %d)', job_id))
     return
@@ -44,8 +44,8 @@ local function build()
     edit()
     return
   end
-  if opts.shell ~= '' then
-    shell = fmt('%s ', opts.shell)
+  if opts.command ~= '' then
+    command = fmt('%s ', opts.command)
   end
   if opts.wincmd ~= '' then
     cmd(opts.wincmd)
@@ -55,7 +55,7 @@ local function build()
   end
   cmd(fmt('buffer %d', job_buffer))
   fn.setbufvar(job_buffer, '&modified', 0)
-  job_id = fn.termopen(fmt('%s%s', shell, opts.buildfile))
+  job_id = fn.termopen(fmt('%s%s', command, opts.buildfile))
   api.nvim_feedkeys(nkeys, 'n', false)
 end
 
