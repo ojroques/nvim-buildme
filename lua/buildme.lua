@@ -30,6 +30,7 @@ end
 local function edit()
   local autocmd = 'au BufWritePost <buffer> call jobstart("chmod +x %s")'
   cmd(fmt('edit %s', opts.buildfile))
+  -- Make the build file executable
   cmd(fmt(autocmd, opts.buildfile))
 end
 
