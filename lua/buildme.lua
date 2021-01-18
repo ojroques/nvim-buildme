@@ -34,7 +34,6 @@ local function edit()
 end
 
 local function build()
-  local command = ''
   if is_running() then
     echo('ErrorMsg', fmt('A build job is already running (id: %d)', job_id))
     return
@@ -44,16 +43,22 @@ local function build()
     edit()
     return
   end
+  local command = ''
   if opts.command ~= '' then
     command = fmt('%s ', opts.command)
-  end
-  if opts.wincmd ~= '' then
-    cmd(opts.wincmd)
   end
   if not job_buffer or fn.buflisted(job_buffer) == 0 then
     job_buffer = api.nvim_create_buf(true, true)
   end
-  cmd(fmt('buffer %d', job_buffer))
+  local job_window = fn.bufwinnr(job_buffer)
+  if job_window == -1 then
+    if opts.wincmd ~= '' then
+      cmd(opts.wincmd)
+    end
+    cmd(fmt('buffer %d', job_buffer))
+  else
+    cmd(fmt('%d wincmd w', job_window))
+  end
   fn.setbufvar(job_buffer, '&modified', 0)
   job_id = fn.termopen(fmt('%s%s', command, opts.buildfile))
   api.nvim_feedkeys(nkeys, 'n', false)
