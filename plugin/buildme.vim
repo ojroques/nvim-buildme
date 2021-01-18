@@ -6,7 +6,8 @@ if exists('g:loaded_buildme')
   finish
 endif
 
+command! BuildMeEdit lua require('buildme').edit()
 command! BuildMe lua require('buildme').build()
-command! StopMe lua require('buildme').stop()
+command! BuildMeStop lua require('buildme').stop()
 
-let g:loaded_lspfuzzy = 1
+let g:loaded_buildme = 1
