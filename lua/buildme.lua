@@ -5,7 +5,7 @@
 -------------------- VARIABLES -----------------------------
 local api, cmd, fn, vim = vim.api, vim.cmd, vim.fn, vim
 local fmt = string.format
-local nkeys = api.nvim_replace_termcodes('<C-\\><C-n>', true, false, true)
+local nkeys = api.nvim_replace_termcodes('<C-\\><C-n>G', true, false, true)
 local job_buffer, job_id
 
 -------------------- OPTIONS -------------------------------
@@ -40,7 +40,7 @@ local function build()
     return
   end
   if fn.filereadable(opts.buildfile) == 0 then
-    echo('WarningMsg', fmt('Build file %s not found', opts.buildfile))
+    echo('WarningMsg', fmt("Build file '%s' not found", opts.buildfile))
     edit()
     return
   end
