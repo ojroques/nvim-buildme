@@ -25,7 +25,7 @@ call plug#end()
 
 ## Usage
 The plugin checks for a build file and runs it in a terminal buffer. By default,
-that file is a shell script named `.buildme.sh` located in the current working
+this file is a shell script named `.buildme.sh` located in the current working
 directory.
 
 If you're using Neovim built-in LSP client, the working directory should be
