@@ -1,7 +1,8 @@
 # nvim-buildme
 
 A Neovim plugin to build or run a project using the built-in terminal. It is
-written entirely in Lua. See [example](#example) below for a demo.
+very small (~90 SLOC) and written entirely in Lua. See [example](#example) below
+for a demo.
 
 _**Note**: this plugin is mainly for my own use. I won't add new features if I
 don't need them. Feel free to submit PRs or fork the plugin though._
@@ -28,9 +29,8 @@ The plugin checks for a build file and runs it in a terminal buffer. By default,
 this file is a shell script named `.buildme.sh` located in the current working
 directory.
 
-If you're using Neovim built-in LSP client, the working directory should be
-automatically set to the project root. Otherwise you may want to check
-[vim-rooter](https://github.com/airblade/vim-rooter).
+If you want your working directory to be automatically set to your project root,
+you should check [vim-rooter](https://github.com/airblade/vim-rooter).
 
 To run a build job:
 ```vim
@@ -64,6 +64,10 @@ require('buildme').setup {
 Here the buildfile (in the right window) is a simple shell script with a single
 command: `make everything`. Running `:BuildMe` executes this script
 asynchronously in a new terminal buffer.
+
+This is particularly useful when your build process is more complex than simply
+running `make`, or if you want to run a Python script immediately after editing
+it for instance.
 
 ## License
 [LICENSE](./LICENSE)
