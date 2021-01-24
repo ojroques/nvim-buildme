@@ -63,10 +63,12 @@ local function build()
     end
     cmd(fmt('buffer %d', job_buffer))
   end
-  -- Unset modified flag
-  fn.setbufvar(job_buffer, '&modified', 0)
+  -- Set buffer options
+  api.nvim_buf_set_option(job_buffer, 'filetype', 'buildme')
+  api.nvim_buf_set_option(job_buffer, 'modified', false)
   -- Start build job
   job_id = fn.termopen(fmt('%s%s', interpreter, opts.buildfile))
+  api.nvim_buf_set_name(job_buffer, '[buildme]')
   -- Exit terminal mode
   api.nvim_feedkeys(nkeys, 'n', false)
 end
