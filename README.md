@@ -1,8 +1,8 @@
 # nvim-buildme
 
 A Neovim plugin to build or run a project using the built-in terminal. It is
-very small (~90 SLOC) and written entirely in Lua. See [example](#example) below
-for a demo.
+very small (~100 SLOC) and written entirely in Lua. See [example](#example)
+below for a demo.
 
 _**Note**: this plugin is mainly for my own use. I won't add new features if I
 don't need them. Feel free to submit PRs or fork the plugin though._
@@ -45,6 +45,11 @@ To stop a running build job:
 To edit the build file:
 ```vim
 :BuildMeEdit<CR>
+```
+
+To jump to the buildme buffer:
+```vim
+:BuildMeJump<CR>
 ```
 
 ## Configuration
