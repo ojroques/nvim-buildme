@@ -13,7 +13,7 @@ local M = {}
 local opts = {
   buildfile = '.buildme.sh',  -- the build file to execute
   interpreter = 'bash',       -- the interpreter to use (bash, python, ...)
-  wincmd = '',                -- a command to run prior to a build job
+  wincmd = '',                -- a window command to run prior to a build job
 }
 
 -------------------- HELPERS -------------------------------
@@ -23,12 +23,18 @@ local function echo(hlgroup, msg)
   cmd('echohl None')
 end
 
+local function buffer_exists()
+  return job_buffer and fn.buflisted(job_buffer) == 1
+end
+
 local function job_running()
   return job_id and fn.jobwait({job_id}, 0)[1] == -1
 end
 
-local function buffer_exists()
-  return job_buffer and fn.buflisted(job_buffer) == 1
+local function job_exit(job_id, exit_code, _)
+  local hlgroup = exit_code == 0 and 'None' or 'WarningMsg'
+  local msg = fmt('Job %d has finished with exit code %d', job_id, exit_code)
+  echo(hlgroup, msg)
 end
 
 -------------------- PUBLIC --------------------------------
@@ -50,7 +56,7 @@ function M.jump()
     cmd(fmt('%d wincmd w', job_window))
     return
   end
-  -- Run user command
+  -- Run window command
   if opts.wincmd ~= '' then
     cmd(opts.wincmd)
   end
@@ -82,7 +88,9 @@ function M.build()
   api.nvim_buf_set_option(job_buffer, 'filetype', 'buildme')
   api.nvim_buf_set_option(job_buffer, 'modified', false)
   -- Start build job
-  job_id = fn.termopen(fmt('%s%s', interpreter, opts.buildfile))
+  local command = fmt('%s%s', interpreter, opts.buildfile)
+  job_id = fn.termopen(command, {on_exit = job_exit})
+  -- Rename buffer
   api.nvim_buf_set_name(job_buffer, '[buildme]')
   -- Exit terminal mode
   api.nvim_feedkeys(nkeys, 'n', false)
