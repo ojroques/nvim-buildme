@@ -4,24 +4,15 @@ A Neovim plugin to build or run a project using the built-in terminal. It is
 very small (~100 SLOC) and written entirely in Lua. See [example](#example)
 below for a demo.
 
-_**Note**: this plugin is mainly for my own use. I won't add new features if I
-don't need them. Feel free to submit PRs or fork the plugin though._
-
 ## Installation
-
-#### With Packer
+With [packer.nvim](https://github.com/wbthomason/packer.nvim):
 ```lua
-cmd 'packadd packer.nvim'
-return require('packer').startup(function()
-  use {'ojroques/nvim-buildme'}
-end)
+use {'ojroques/nvim-buildme'}
 ```
 
-#### With Plug
-```vim
-call plug#begin()
-Plug 'ojroques/nvim-buildme'
-call plug#end()
+With [paq-nvim](https://github.com/savq/paq-nvim):
+```lua
+paq {'ojroques/nvim-buildme'}
 ```
 
 ## Usage
