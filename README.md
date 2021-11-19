@@ -65,5 +65,8 @@ This is particularly useful when your build process is more complex than simply
 running `make`, or if you want to run a Python script immediately after editing
 it for instance.
 
+Here's a full example of a buildme file for CMake:
+[buildme.sh](https://gist.github.com/ojroques/9824c85cfd1eabafb3c0be5530c35b5a)
+
 ## License
 [LICENSE](./LICENSE)

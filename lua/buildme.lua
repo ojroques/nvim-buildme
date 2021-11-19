@@ -16,7 +16,7 @@ local opts = {
   wincmd = '',                -- a window command to run prior to a build job
 }
 
--------------------- HELPERS -------------------------------
+-------------------- PRIVATE -------------------------------
 local function echo(hlgroup, msg)
   cmd(fmt('echohl %s', hlgroup))
   cmd(fmt('echo "[buildme] %s"', msg))
