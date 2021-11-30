@@ -25,22 +25,24 @@ you should check [vim-rooter](https://github.com/airblade/vim-rooter).
 
 To run a build job:
 ```vim
-:BuildMe<CR>
+:BuildMe
 ```
+Use `:BuildMe!` to pass the `force` option (by default `--force`,
+[configurable](#configuration)) to the final command.
 
 To stop a running build job:
 ```vim
-:BuildMeStop<CR>
+:BuildMeStop
 ```
 
 To edit the build file:
 ```vim
-:BuildMeEdit<CR>
+:BuildMeEdit
 ```
 
 To jump to the buildme buffer:
 ```vim
-:BuildMeJump<CR>
+:BuildMeJump
 ```
 
 ## Configuration
@@ -50,6 +52,7 @@ options with their default settings:
 require('buildme').setup {
   buildfile = '.buildme.sh',  -- the build file to execute
   interpreter = 'bash',       -- the interpreter to use (bash, python, ...)
+  force = '--force',          -- the option to pass when the bang is used
   wincmd = '',                -- a command to run prior to a build job (split, vsplit, ...)
 }
 ```

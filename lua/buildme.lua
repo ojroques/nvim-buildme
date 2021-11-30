@@ -13,6 +13,7 @@ local M = {}
 local opts = {
   buildfile = '.buildme.sh',  -- the build file to execute
   interpreter = 'bash',       -- the interpreter to use (bash, python, ...)
+  force = '--force',          -- the option to pass when the bang is used
   wincmd = '',                -- a window command to run prior to a build job
 }
 
@@ -63,7 +64,7 @@ function M.jump()
   cmd(fmt('buffer %d', job_buffer))
 end
 
-function M.build()
+function M.build(bang)
   if job_running() then
     echo('ErrorMsg', fmt('A build job is already running (id: %d)', job_id))
     return
@@ -75,8 +76,12 @@ function M.build()
   end
   -- Format interpreter string
   local interpreter = ''
+  local force = ''
   if opts.interpreter ~= '' then
     interpreter = fmt('%s ', opts.interpreter)
+  end
+  if bang and opts.force ~= '' then
+    force = fmt(' %s', opts.force)
   end
   -- Create scratch buffer
   if not buffer_exists() then
@@ -88,7 +93,7 @@ function M.build()
   api.nvim_buf_set_option(job_buffer, 'filetype', 'buildme')
   api.nvim_buf_set_option(job_buffer, 'modified', false)
   -- Start build job
-  local command = fmt('%s%s', interpreter, opts.buildfile)
+  local command = fmt('%s%s%s', interpreter, opts.buildfile, force)
   job_id = fn.termopen(command, {on_exit = job_exit})
   -- Rename buffer
   api.nvim_buf_set_name(job_buffer, '[buildme]')
