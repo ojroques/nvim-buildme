@@ -10,7 +10,7 @@ local job_buffer, job_id
 local M = {}
 
 -------------------- OPTIONS -------------------------------
-local opts = {
+local options = {
   buildfile = '.buildme.sh',  -- the build file to execute
   interpreter = 'bash',       -- the interpreter to use (bash, python, ...)
   force = '--force',          -- the option to pass when the bang is used
@@ -40,10 +40,10 @@ end
 
 -------------------- PUBLIC --------------------------------
 function M.edit()
-  cmd(fmt('edit %s', opts.buildfile))
+  cmd(fmt('edit %s', options.buildfile))
   -- Make the build file executable
   local autocmd = 'au BufWritePost <buffer> call jobstart("chmod +x %s")'
-  cmd(fmt(autocmd, opts.buildfile))
+  cmd(fmt(autocmd, options.buildfile))
 end
 
 function M.jump()
@@ -58,8 +58,8 @@ function M.jump()
     return
   end
   -- Run window command
-  if opts.wincmd ~= '' then
-    cmd(opts.wincmd)
+  if options.wincmd ~= '' then
+    cmd(options.wincmd)
   end
   cmd(fmt('buffer %d', job_buffer))
 end
@@ -69,19 +69,19 @@ function M.build(bang)
     echo('ErrorMsg', fmt('A build job is already running (id: %d)', job_id))
     return
   end
-  if fn.filereadable(opts.buildfile) == 0 then
-    echo('WarningMsg', fmt("Build file '%s' not found", opts.buildfile))
+  if fn.filereadable(options.buildfile) == 0 then
+    echo('WarningMsg', fmt("Build file '%s' not found", options.buildfile))
     M.edit()
     return
   end
   -- Format interpreter string
   local interpreter = ''
   local force = ''
-  if opts.interpreter ~= '' then
-    interpreter = fmt('%s ', opts.interpreter)
+  if options.interpreter ~= '' then
+    interpreter = fmt('%s ', options.interpreter)
   end
-  if bang and opts.force ~= '' then
-    force = fmt(' %s', opts.force)
+  if bang and options.force ~= '' then
+    force = fmt(' %s', options.force)
   end
   -- Create scratch buffer
   if not buffer_exists() then
@@ -93,7 +93,7 @@ function M.build(bang)
   api.nvim_buf_set_option(job_buffer, 'filetype', 'buildme')
   api.nvim_buf_set_option(job_buffer, 'modified', false)
   -- Start build job
-  local command = fmt('%s%s%s', interpreter, opts.buildfile, force)
+  local command = fmt('%s%s%s', interpreter, options.buildfile, force)
   job_id = fn.termopen(command, {on_exit = job_exit})
   -- Rename buffer
   api.nvim_buf_set_name(job_buffer, '[buildme]')
@@ -111,8 +111,11 @@ function M.stop()
 end
 
 -------------------- SETUP ---------------------------------
-function M.setup(user_opts)
-  opts = vim.tbl_extend('keep', user_opts, opts)
+function M.setup(user_options)
+  options = vim.tbl_extend('keep', user_options, options)
+  if user_options then
+    M.options = vim.tbl_extend('force', M.options, user_options)
+  end
 end
 
 ------------------------------------------------------------
