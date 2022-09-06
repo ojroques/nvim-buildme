@@ -58,7 +58,7 @@ require('buildme').setup {
 ```
 
 ## Example
-![demo](./demo.gif)
+![demo](https://user-images.githubusercontent.com/23409060/188605771-4d90a9af-a11b-4e85-8cc5-325c2dbbfac6.gif)
 
 Here the buildfile (in the right window) is a simple shell script with a single
 command: `make everything`. Running `:BuildMe` executes this script
