@@ -96,7 +96,7 @@ function M.build(bang)
   local command = fmt('%s%s%s', interpreter, options.buildfile, force)
   job_id = fn.termopen(command, {on_exit = job_exit})
   -- Rename buffer
-  api.nvim_buf_set_name(job_buffer, '[buildme]')
+  api.nvim_buf_set_name(job_buffer, 'buildme://job')
   -- Exit terminal mode
   api.nvim_feedkeys(nkeys, 'n', false)
 end
