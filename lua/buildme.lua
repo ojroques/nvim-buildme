@@ -3,116 +3,108 @@
 -- github.com/ojroques
 
 -------------------- VARIABLES -----------------------------
-local api, cmd, fn, vim = vim.api, vim.cmd, vim.fn, vim
-local fmt = string.format
-local nkeys = api.nvim_replace_termcodes('<C-\\><C-n>G', true, false, true)
+local tkeys = vim.api.nvim_replace_termcodes('<C-\\><C-n>G', true, false, true)
 local job_buffer, job_id
 local M = {}
 
 -------------------- OPTIONS -------------------------------
-local options = {
-  buildfile = '.buildme.sh',  -- the build file to execute
-  interpreter = 'bash',       -- the interpreter to use (bash, python, ...)
-  force = '--force',          -- the option to pass when the bang is used
-  wincmd = '',                -- a window command to run prior to a build job
+M.options = {
+  script = '.buildme.sh',  -- the Buildme script to execute
+  interpreter = 'bash',    -- the interpreter to use (bash, python, ...)
+  wincmd = '',             -- a window command to run prior to a Buildme job
 }
 
 -------------------- PRIVATE -------------------------------
-local function echo(hlgroup, msg)
-  cmd(fmt('echohl %s', hlgroup))
-  cmd(fmt('echo "[buildme] %s"', msg))
-  cmd('echohl None')
-end
-
 local function buffer_exists()
-  return job_buffer and fn.buflisted(job_buffer) == 1
+  return job_buffer and vim.fn.buflisted(job_buffer) == 1
 end
 
 local function job_running()
-  return job_id and fn.jobwait({job_id}, 0)[1] == -1
+  return job_id and vim.fn.jobwait({job_id}, 0)[1] == -1
 end
 
 local function job_exit(job_id, exit_code, _)
-  local hlgroup = exit_code == 0 and 'None' or 'WarningMsg'
-  local msg = fmt('Job %d has finished with exit code %d', job_id, exit_code)
-  echo(hlgroup, msg)
+  local level = exit_code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
+  local msg = string.format('Buildme job %d has exited with code %d', job_id, exit_code)
+  vim.notify(msg, level)
 end
 
 -------------------- PUBLIC --------------------------------
 function M.edit()
-  cmd(fmt('edit %s', options.buildfile))
-  -- Make the build file executable
-  local autocmd = 'au BufWritePost <buffer> call jobstart("chmod +x %s")'
-  cmd(fmt(autocmd, options.buildfile))
+  vim.cmd(string.format('edit %s', M.options.script))
 end
 
 function M.jump()
   if not buffer_exists() then
-    echo('WarningMsg', 'No buildme buffer')
+    vim.notify('No Buildme buffer', vim.log.levels.WARN)
     return
   end
-  local job_window = fn.bufwinnr(job_buffer)
+
   -- Jump to the buffer window if it exists
+  local job_window = vim.fn.bufwinnr(job_buffer)
   if job_window ~= -1 then
-    cmd(fmt('%d wincmd w', job_window))
+    vim.cmd(string.format('%d wincmd w', job_window))
     return
   end
-  -- Run window command
-  if options.wincmd ~= '' then
-    cmd(options.wincmd)
+
+  -- Run window command if defined
+  if M.options.wincmd ~= '' then
+    vim.cmd(M.options.wincmd)
   end
-  cmd(fmt('buffer %d', job_buffer))
+
+  vim.cmd(string.format('buffer %d', job_buffer))
 end
 
-function M.build(bang)
+function M.run(args)
   if job_running() then
-    echo('ErrorMsg', fmt('A build job is already running (id: %d)', job_id))
+    vim.notify(string.format('Buildme job %d is already running', job_id), vim.log.levels.WARN)
     return
   end
-  if fn.filereadable(options.buildfile) == 0 then
-    echo('WarningMsg', fmt("Build file '%s' not found", options.buildfile))
+
+  if vim.fn.filereadable(M.options.script) == 0 then
+    vim.notify(string.format("Buildme script '%s' not found", M.options.script), vim.log.levels.WARN)
     M.edit()
     return
   end
-  -- Format interpreter string
-  local interpreter = ''
-  local force = ''
-  if options.interpreter ~= '' then
-    interpreter = fmt('%s ', options.interpreter)
-  end
-  if bang and options.force ~= '' then
-    force = fmt(' %s', options.force)
-  end
+
   -- Create scratch buffer
   if not buffer_exists() then
-    job_buffer = api.nvim_create_buf(true, true)
+    job_buffer = vim.api.nvim_create_buf(true, true)
   end
+
   -- Jump to buffer
   M.jump()
-  -- Set buffer options
-  api.nvim_buf_set_option(job_buffer, 'filetype', 'buildme')
-  api.nvim_buf_set_option(job_buffer, 'modified', false)
-  -- Start build job
-  local command = fmt('%s%s%s', interpreter, options.buildfile, force)
-  job_id = fn.termopen(command, {on_exit = job_exit})
-  -- Rename buffer
-  api.nvim_buf_set_name(job_buffer, 'buildme://job')
+
+  -- Configure buffer
+  vim.api.nvim_set_option_value('filetype', 'buildme', {buf = job_buffer})
+  vim.api.nvim_set_option_value('modified', false, {buf = job_buffer})
+  vim.api.nvim_buf_set_name(job_buffer, 'buildme://job')
+
+  -- Format arguments
+  local a = ''
+  if args and #args > 0 then
+    a = string.format(' %s', table.concat(args, ' '))
+  end
+
+  -- Start job
+  local cmd = string.format('%s %s%s', M.options.interpreter, M.options.script, a)
+  job_id = vim.fn.termopen(cmd, {on_exit = job_exit})
+
   -- Exit terminal mode
-  api.nvim_feedkeys(nkeys, 'n', false)
+  vim.api.nvim_feedkeys(tkeys, 'n', false)
 end
 
 function M.stop()
-  if job_running() then
-    fn.jobstop(job_id)
-    echo('None', fmt('Stopped job %d', job_id))
+  if not job_running() then
+    vim.notify('No Buildme job to stop', vim.log.levels.INFO)
     return
   end
-  echo('None', 'No job to stop')
+
+  vim.fn.jobstop(job_id)
 end
 
 -------------------- SETUP ---------------------------------
 function M.setup(user_options)
-  options = vim.tbl_extend('keep', user_options, options)
   if user_options then
     M.options = vim.tbl_extend('force', M.options, user_options)
   end
